@@ -1,0 +1,153 @@
+<html>
+<head>
+<title>CpE/CSc 159 Phase 2, System Service Calls</title>
+</head>
+<body>
+<small><i>
+Sacramento State
+<br>Computer Engineering / Computer Science
+<br>CpE/CSc159 Operating System Pragmatics (Fall 2017)
+<br>Instructor: W. Chang
+</i></small>
+
+<p>
+<center><h3>
+Phase 2 &nbsp; System Service Calls
+</h3>
+</center>
+
+<b>Kernel Services to Processes</tt></b>
+<ol>
+<li>
+During the runtime of processes, all system services are requested
+through system-service calls (<tt>syscalls</tt>), in order for the
+kernel to check the validity of the request, executes safe code,
+synchronize processes (trapped and await for results). Our <tt>UserProc()</tt>
+will make requests to try out the three new services as the goals
+of this OS-construction phase: <tt>Write()</tt> <tt>GetPid()</tt>,
+and <tt>Sleep()</tt>.
+A <i>system service call</i> will cause the action to suspend the calling
+process in order to execute the service code. Afterward the process
+may either resume or be otherwise treated due to the outcome of what
+is being requested (I/O waits, resources handling, etc.).
+<li>
+The service calls are in <b><i>syscalls.c</i></b> in which <i>inline</i>
+assembly of CPU instructions are embedded, in order to invoke the kernel
+code as an event. Particularly, the "<tt>int #</tt>" instruction which
+is voluntarily coded to "interrupt" the process runtime itself and
+the hardware will assist to switch CPU to execute the kernel code.
+This is the main difference to a hardware event such as the timer.
+There is no PIC mask to set, or IRQ to dismiss.
+<li>
+After the <i>int #</i> code of a <i>syscall</i>, the process will
+eventually resume to execute the continuation code in the <i>syscalls.c</i>
+or return to its original code from the call. An example is the
+<tt>GetPid()</tt> call will retrieve the process ID via the
+CPU <tt>EAX</tt> register. The code of the service handler
+<tt>GetPidHandler</tt> would have placed the PID of the running
+process (temporarily suspended) into the process frame, to be later
+fetch by the syscall code as a function return value.
+<li>
+Similar to how <tt>TimerEvent</tt> is coded in <i>events.S</i>, the
+<tt>SyscallEvent</tt> is to be added. The address of this new code
+is to be added to the IDT at entry number <b>128</b>.
+<li>
+Coding details are listed in the <a href=WhatToCode.txt>WhatToCode.txt</a>.
+</ol>
+
+<b>Enable Kernel Services</b>
+<p>
+
+<ol>
+<li>
+The <tt><b>SYSCALL_EVENT</tt></b> is selected in the IDT at entry
+128 (UNIX/Linux uses 0x80) where we shall register the address of
+a <tt><b>SyscallEvent</tt></b> code module similar to the TimerEvent
+in the <i><b>events.S</i></b>.
+Both code modules are to be changed so each will push its own identifier
+number into the process frame in the runtime stack. The TimerEvent
+shall push TIMER_EVENT while SyscallEvent 128. Afterward, both
+jump to a common routine <tt><b>TheRest</b></tt> to complete the
+rest of the code which is the code in the original TimerEvent.
+<li>
+Different from the handling of a timer event, a syscall event
+does not involve the PIC mask or dismissal of an IRQ. However,
+the <i>API</i> will be provided in a program file <i><b>syscalls.c</i></b>
+where <b><tt>asm()</tt></b> macros are used to embed CPU instructions
+including <tt><b>int 128</b></tt> in order to "trap" the process
+and switch the CPU to run the SyscallEvent code.
+<li>
+Each API code module should prepare what are to be given to the
+kernel to perform the service, as well as receiving a return if
+any is supposed to be given back to the calling process.
+</ol>
+
+<b>Kernel Service Handlers</b>
+<ol>
+<li>
+Each service is actually performed by a handler function in the
+program file <i>handlers.c</i>. A handler is called based on the
+service request number given to the register EAX of the CPU by
+the API code. This information will then be examined as the saved
+value of the register is part of the process frame "trapped" by
+the event handling code. The process frame pointer in the PCB
+determines which handler to be executed by the kernel main code.
+<li>
+For the <tt>GetPid()</tt> call, the service number is a constant
+<tt>GETPID 100</tt>, and the <tt>GetPidHandler()</tt> will
+be called upon to handle it. What is to be done there is to return
+the currently-running PID to the process via the process frame
+(using a register) which will be loaded back by the ProcLoader
+and the API code continues (after <tt>int 128</tt>) and it will
+then retrieve it as the API function return value.
+<li>
+The <tt>Write()</tt> call will send to the kernel the service
+request number (<tt>WRITE 4</tt>) in register EAX, the
+<tt>STDOUT</tt> number (1) in EBX, and the character array
+(address) in register ECX; in order for the kernel to call
+the handler <tt>WriteHandler</tt> to process it. (Albeit it
+is just a <i>cons_printf()</i> call in the handler.)
+<li>
+The <b><tt>SleepHandler()</tt></b> will compute the wake-up time
+of the process by adding the current time <tt>timer_tick</tt> and
+<tt>100 x sleep seconds requested</tt>, and keept the result in
+the PCB. The state of the process is altered to <i>SLEEPING</i>
+and the running PID is reset to -1.
+<li>
+The <tt>TimerHandler()</tt> will first upcount the current time
+indicator <i>timer_ticks</i> and check if any processes need to
+be waken: loop through each PCB -- if asleep and wakeup time
+arrives, enqueue PID to the run queue and alter its state.
+Other code in the TimerHandler remains.
+</ul>
+</ol>
+
+<b>Deliverables</b>
+<ul>
+As before, via the SAMBA client <i>smbclient</i> to submit only the
+source files (not binary files or intermediate compiler files) into
+your team folder under the folder <i>phase2</i>.
+</ul>
+
+<b>Review Questions</b>
+<ol>
+<li>
+Point out the differences between the setup and handling of a hardware
+interrupt (such as the timer), and a syscall?
+<li>
+Why bother saving the process frame pointer at the beginning of Kernel()?
+<li>
+How to check the wake time against the current time to wake? Will "=="
+be enough? Or a ">=" is needed?
+<li>
+What can happen with <i>your</i> current code if testing with "Sleep(0)"
+or "Sleep(-1)?" What is a good strategy to handle for these exceptions?
+<li>
+Can the current time become different to the real time (wall clock) after
+after given some runtime that is sufficiently lengthy?
+<li>
+What differs a cooperative OS versus a preemptive one? What can be the
+pros and cons?
+
+</ol>
+
