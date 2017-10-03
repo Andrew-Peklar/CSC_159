@@ -55,14 +55,14 @@ void TimerHandler(void) {
 }
 ////////////////////////////////////////////////
 void GetPidHandler(void){
-  outportb(0x20, 0x60);
   pcb[run_pid].proc_frame_p-> EAX = run_pid;
+  outportb(0x20, 0x60); 
 }
 ////////////////////////////////////////
-void WriteHandler(proc_frame_t p){
-	int IOBuffer = pcb[run_pid].proc_frame_p-> EBX;
-	char *str;
-	if(IOBuffer == STDOUT){
+void WriteHandler(proc_frame_t* p){
+	int Buffit = pcb[run_pid].proc_frame_p-> EBX;
+	char *str = (char *)pcb[run_pid].proc_frame_p-> ECX;
+	if(Buffit == STDOUT){
 		cons_printf(str);	
 	}
 }

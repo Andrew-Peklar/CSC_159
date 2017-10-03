@@ -42,7 +42,13 @@ void Write(int fileno, char *p) {
 
 void Sleep(int seconds2sleep) {
 
-	asm("movl %%EBX, %0; movl $101, %%EAX;"
+	asm("pushl %%EAX;
+		pushl %%EBX;
+		movl %0, %%EBX;
+		movl $101, %%EAX;
+		int $128;
+		popl %%EAX;
+		popl %%EBX"
 		:		
 		:"g" (seconds2sleep)
 		);	

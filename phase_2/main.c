@@ -9,7 +9,6 @@
 #include "tools.h"      // small functions for handlers
 #include "proc.h"       // process names such as SystemProc()
 #include "handlers.h"   // handler code
-//#include "syscalls.c"
 #include "syscalls.h"
 
 // kernel data are all declared here:
@@ -74,10 +73,10 @@ void Kernel(proc_frame_t *proc_frame_p) {   // kernel code runs (100 times/secon
        else if(proc_frame_p->EAX == SLEEP)
          SleepHandler();
        else
-         //KernelPanicHandler(SYSCALL_EVENT);
+	cons_printf("Dont"); 
        break;
-	default: 
-	//KernelPanicHandler(proc_frame_p->event_type);
+	default:
+	cons_printf("PANIC"); 
    }
 
    if (cons_kbhit()) {

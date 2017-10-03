@@ -2,9 +2,7 @@
 
 #ifndef _TYPES_H_
 #define _TYPES_H_
-
-#define TIMER_EVENT 32       // IDT entry #32 has code addr for timer event (DOS IRQ0)
-#define SYSCALL_EVENT 128
+   
 #define WRITE 4
 #define GETPID 100
 #define SLEEP 101
@@ -17,14 +15,14 @@
 #define PROC_STACK_SIZE 4096 // process runtime stack in bytes
 typedef void (*func_p_t)(void); // void-return function pointer type
 
-typedef enum {READY, RUN} state_t;
+typedef enum {READY, RUN, SLEEPING} state_t;
 
 typedef struct {
-   unsigned int PUSHA[8];
-   unsigned int EAX[4];
-   unsigned int EBX[4];
-   unsigned int ECX[4];
-   unsigned int EDX[4];
+   unsigned int PUSHA[8]; //<-----
+   unsigned int EAX;
+   unsigned int EBX;
+   unsigned int ECX;
+   unsigned int EDX;
    unsigned int event_type;
    unsigned int EIP;
    unsigned int CS;
@@ -33,7 +31,6 @@ typedef struct {
 
 typedef struct {
    state_t state;            // state of process
-   state_t SLEEPING;
    int run_time;             // CPU runtime this time
    int life_time;            // total CPU runtime
    int wake_time;
