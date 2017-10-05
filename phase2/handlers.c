@@ -20,10 +20,13 @@ void NewProcHandler(func_p_t p) {  // arg: where process code starts
 
    pid = DeQ(&ready_q);
    MyBzero((char *)&pcb[pid], sizeof(pcb_t));
+   MyBzero((char *)proc_stack[pid], sizeof(proc_stack[pid]));
    pcb[pid].state = RUN;
-   EnQ(pid, &run_q);
-
-   pcb[pid].proc_frame_p = (proc_frame_t *)&proc_stack[pid][0];
+   if(pid !=0)
+   {
+      EnQ(pid, &run_q);
+   }
+   pcb[pid].proc_frame_p = (proc_frame_t *)&proc_stack[pid][PROC_STACK_SIZE-sizeof(proc_frame_t)];
 
    pcb[pid].proc_frame_p->EFL = EF_DEFAULT_VALUE|EF_INTR;
    pcb[pid].proc_frame_p->EIP = (int)p;
@@ -67,7 +70,6 @@ void WriteHandler(proc_frame_t* p){
 	}
 }
 void SleepHandler(void){
-      outportb(0x20, 0x60);
       pcb[run_pid].wake_time = timer_ticks + 100 * (pcb[run_pid].proc_frame_p-> EBX);
       pcb[run_pid].state = SLEEPING;
       run_pid = -1;

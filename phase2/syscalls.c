@@ -42,8 +42,8 @@ void Write(int fileno, char *p) {
 
 void Sleep(int seconds2sleep) {
 
-	asm("pushl %%EAX;
-		pushl %%EBX;
+	asm("   pushl %%EBX;
+                pushl %%EAX;
 		movl %0, %%EBX;
 		movl $101, %%EAX;
 		int $128;

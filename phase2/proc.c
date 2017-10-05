@@ -7,6 +7,7 @@
 #include "data.h"       // run_pid needed
 #include "proc.h"       // prototypes of processes
 #include "syscalls.h"   // API of system service calls
+//#include "syscalls.c"
 
 void SystemProc(void) {
    while(1) asm("inb $0x80"); // do nothing for now

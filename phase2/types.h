@@ -18,7 +18,7 @@ typedef void (*func_p_t)(void); // void-return function pointer type
 typedef enum {READY, RUN, SLEEPING} state_t;
 
 typedef struct {
-   unsigned int PUSHA[8]; //<-----
+   unsigned int FOUR[4]; //<-----
    unsigned int EAX;
    unsigned int EBX;
    unsigned int ECX;
