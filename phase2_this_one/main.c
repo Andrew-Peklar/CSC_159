@@ -76,7 +76,7 @@ void Kernel(proc_frame_t *proc_frame_p) {   // kernel code runs (100 times/secon
       else if (key == 'b')  breakpoint();
    }
 
-   NewProcHandler(SystemProc);
+  // NewProcHandler(SystemProc); <------ removed by Khalid
    ProcScheduler();
    ProcLoader(pcb[run_pid].proc_frame_p);
 }
