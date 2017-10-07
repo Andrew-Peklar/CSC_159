@@ -59,7 +59,7 @@ void TimerHandler(void) {
    pcb[run_pid].run_time++;
 
    //check to see if it used up time slice
-   if(pcb[run_pid].run_time == TIME_SLICE) {
+   if(pcb[run_pid].run_time >= TIME_SLICE) {
       EnQ(run_pid, &run_q);
       run_pid = -1;
    }
