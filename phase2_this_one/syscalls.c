@@ -25,9 +25,9 @@ void Write(int fileno, char *p) {       //<---------------
         movl  %0, %%EBX;
         movl  %1, %%ECX;
         int   $128;
-        popl  %%ECX;
+        popl  %%EAX;
         popl  %%EBX;
-        popl  %%EAX;"
+        popl  %%ECX;"
         :                               // no outputs, otherwise use "=g" (...)
         : "g" (fileno), "g" ((int)p)   // inputs, %0 and %1
        );
