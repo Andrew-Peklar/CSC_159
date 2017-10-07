@@ -23,6 +23,7 @@ ENTRY(SyscallEvent)
    jmp   TestRest
 
 TestRest:
+   pusha
    movl  %ESP, %EBX
    cld
    mov   $0x10, %ax            // set kernel data segment registers
