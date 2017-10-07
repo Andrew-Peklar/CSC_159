@@ -41,7 +41,7 @@ void WriteHandler(proc_frame_t* p){
 // count run_time of running process and preempt it if reaching time slice
 void TimerHandler(void) {
    int i;
-   timer_tick++;  //<--------------
+   timer_ticks++;  //<--------------
 
    for(i = 0; i < PROC_NUM; i++) {
      if(pcb[i].state == SLEEPING && timer_ticks == pcb[i].wake_time) {
