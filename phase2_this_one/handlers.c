@@ -44,7 +44,7 @@ void TimerHandler(void) {
    timer_ticks++;  //<--------------
 
    for(i = 0; i < PROC_NUM; i++) {
-     if(pcb[i].state == SLEEPING && timer_ticks == pcb[i].wake_time) {
+     if((pcb[i].state == SLEEPING) && (timer_ticks == pcb[i].wake_time)) {
        EnQ(i, &run_q);
        pcb[i].state = RUN;		//<---- per instruct, wrong in submission
        }
@@ -60,6 +60,7 @@ void TimerHandler(void) {
 
    //check to see if it used up time slice
    if(pcb[run_pid].run_time == TIME_SLICE) {
+      pcb[run_pid].state = READY;
       EnQ(run_pid, &run_q);
       run_pid = -1;
    }
