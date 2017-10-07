@@ -5,10 +5,10 @@
 int GetPid(void) {          // no input, has return
    int pid;
 
-   asm("pushl %%EAX;                    
-        movl  $100, %%EAX;         
-        int   $128;                     
-        movl  %%EAX, %0;               
+   asm("pushl %%EAX;
+        movl  $100, %%EAX;
+        int   $128;
+        movl  %%EAX, %0;
         popl  %%EAX"                    // restore original EAX
        : "=g" (pid)                     // output syntax, for output argument
        :                                // no input items
@@ -22,9 +22,9 @@ void Write(int fileno, char *p) {       //<---------------
         pushl %%EBX;
         pushl %%ECX;
         movl  $4, %%EAX;
-        movl  %0, %%EBX;                
-        movl  %1, %%ECX;                
-        int   $128;                     
+        movl  %0, %%EBX;
+        movl  %1, %%ECX;
+        int   $128;
         popl  %%ECX;
         popl  %%EBX;
         popl  %%EAX;"
@@ -39,13 +39,13 @@ void Write(int fileno, char *p) {       //<---------------
 }
 
 void Sleep(int seconds2sleep) {
-   asm("pushl %%EBX;
-        pushl %%EAX;
-        movl  %0,   %%EBX             
+   asm("pushl %%EAX;
+        pushl %%EBX;
+        movl  %0,   %%EBX
         movl  $101, %%EAX;
         int   $128;
-        popl  %%EBX;
-        popl  %%EAX;"
+        popl  %%EAX;
+        popl  %%EBX;"
         :
         : "g" (seconds2sleep)
        );
