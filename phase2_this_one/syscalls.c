@@ -27,7 +27,7 @@ void Write(int fileno, char *p) {       //<---------------
         int   $128;
         popl  %%EAX;
         popl  %%EBX;
-        popl  %%ECX;"
+        popl  %%ECX"
         :                               // no outputs, otherwise use "=g" (...)
         : "g" (fileno), "g" ((int)p)   // inputs, %0 and %1
        );
@@ -45,7 +45,7 @@ void Sleep(int seconds2sleep) {
         movl  $101, %%EAX;
         int   $128;
         popl  %%EAX;
-        popl  %%EBX;"
+        popl  %%EBX"
         :
         : "g" (seconds2sleep)
        );
