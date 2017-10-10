@@ -32,10 +32,17 @@ void NewProcHandler(func_p_t p) {  // arg: where process code starts
 
 
 void WriteHandler(proc_frame_t* p){
+  int i;
   int IOBuff    = p -> EBX;
   char* strOut  = (char *)p -> ECX;
 
   if(IOBuff == STDOUT)  cons_printf(strOut);
+  else
+    while(*p){
+      outportb(fileno + DATA, *p);
+      for(i = 0; i < 5000; i++) asm("inb $0x80");
+      p++;
+    }
 }
 
 // count run_time of running process and preempt it if reaching time slice
@@ -94,5 +101,3 @@ void MutexUnlockHandler(void){
           pcb[run_pid].state = RUN;
       }
 }
-
-

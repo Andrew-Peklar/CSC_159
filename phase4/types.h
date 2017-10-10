@@ -19,6 +19,9 @@
 #define Q_SIZE            20    // queuing capacity
 #define PROC_STACK_SIZE 4096    // process runtime stack in bytes
 
+#define TERM1 0x2f8
+#define TERM2 0x3e8
+
 typedef void (*func_p_t)(void); // void-return function pointer type
 
 typedef enum {READY, RUN, SLEEPING, WAIT} state_t;
@@ -48,9 +51,9 @@ typedef struct {             // generic queue type
    int q[Q_SIZE];            // integers are queued in q[] array
 } q_t;
 //////////////////////////////////
-typedef struct {             // 
-   int lock;                 // 
-   q_t wait_q;            // 
+typedef struct {             //
+   int lock;                 //
+   q_t wait_q;            //
 } mutex_t;
 //////////////////////////////////
 #endif // _TYPES_H_

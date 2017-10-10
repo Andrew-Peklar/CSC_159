@@ -1,5 +1,5 @@
 // main.c, 159
-// OS bootstrap and kernel code for OS phase 1
+// OS bootstrap and kernel code for OS phase 4
 //
 // Team Name: NULL (Members: Khalid Muslih and Andrew Peklar)
 
@@ -29,26 +29,50 @@ void ProcScheduler(void) {  // choose run_pid to load/run
    pcb[run_pid].run_time = 0;
 }
 
+void InitTerms(void){
+  int i;
+  // set baud, Control Format Control Register 7-E-1 (data- parity-stop bits)
+  // raise DTR, RTS of the serial port to start read/write
+  outportb(TERM1 + BAUDLO, LOBYTE(115200/9600));      // period of each of 9600 bauds
+  outportb(TERM1 + BAUDHI, HIBYTE(115200/9600));
+  outportb(TERM1 + CFCR, CFCR_DLAB);                 // CFCR_DLAB is 0x80
+  outportb(TERM1 + CFCR, CFCR_PEVEN | CFCR_PENAB | CFCR_7BITS);
+
+  for(i=0;i<LOOP;i++) asm("inb $0x80");
+
+  outportb(TERM2 + BAUDLO, LOBYTE(115200/9600));      // period of each of 9600 bauds
+  outportb(TERM2 + BAUDHI, HIBYTE(115200/9600));
+  outportb(TERM2 + CFCR, CFCR_DLAB);                 // CFCR_DLAB is 0x80
+  outportb(TERM2 + CFCR, CFCR_PEVEN | CFCR_PENAB | CFCR_7BITS);
+
+  for(i=0;i<LOOP;i++) asm("inb $0x80");
+}
+
 int main(void) {  // OS bootstraps
    int i;
    struct i386_gate *IDT_p; // DRAM location where IDT is
    pies = 0;
    timer_ticks = 0; //<--------------------
    run_pid = -1;
-   
+
    MyBzero((char *)&run_q, sizeof(q_t));
    MyBzero((char *)&ready_q, sizeof(q_t));
    MyBzero((char *)&mutex.wait_q,sizeof(q_t));
+
    mutex.lock = UNLOCK;
-   ///////////////////////////////////////////
+
+   InitTerms();
+
    for(i=0; i<Q_SIZE; i++) EnQ(i, &ready_q);
 
    IDT_p = get_idt_base();
    cons_printf("IDT located at DRAM addr %x (%d).\n", (int)IDT_p);
 
    fill_gate(&IDT_p[TIMER_EVENT], (int)TimerEvent, get_cs(), ACC_INTR_GATE, 0);
-   fill_gate(&IDT_p[SYSCALL_EVENT], (int)SyscallEvent, get_cs(), ACC_INTR_GATE, 0);
    outportb(0x21, ~0x1);
+
+   fill_gate(&IDT_p[SYSCALL_EVENT], (int)SyscallEvent, get_cs(), ACC_INTR_GATE, 0);
+
 
    NewProcHandler(SystemProc);
    ProcScheduler();
@@ -81,8 +105,8 @@ void Kernel(proc_frame_t *proc_frame_p) {   // kernel code runs (100 times/secon
       key = cons_getchar();
       if (key == 'n')	NewProcHandler(UserProc);
       if (key == 'b')	breakpoint();
-      if (key == 'c')   NewProcHandler(CookerProc);
-      if (key == 'e')   NewProcHandler(EaterProc);
+      if (key == 'c') NewProcHandler(CookerProc);
+      if (key == 'e') NewProcHandler(EaterProc);
    }
 
   // NewProcHandler(SystemProc); <------ removed by Khalid

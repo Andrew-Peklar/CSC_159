@@ -13,11 +13,16 @@ void SystemProc(void) {
 }
 
 void UserProc(void) {
+   int term;
    char my_str[] = "  ";  // 2 spaces
+   char my_msg[] = " : Hello, World!\n\r";
+
+   term = GetPid()%2 == 1? TERM1 : TERM2;
 
    while(1) {
       my_str[0] = GetPid() + '0';  // fill out 1st space
-      Write(STDOUT, my_str);       // STDOUT fileno == 1
+      Write(term, my_str);       // STDOUT fileno == 1
+      write(term, my_msg);
       Sleep( GetPid() % 5 );       // sleep for a few seconds (PID 5?)
    }
 }
