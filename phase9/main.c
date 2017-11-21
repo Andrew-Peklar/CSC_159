@@ -116,8 +116,8 @@ void Kernel(proc_frame_t *proc_frame_p) {   // kernel code runs (100 times/secon
         else if(proc_frame_p -> EAX == GETCHAR)     GetCharHandler(proc_frame_p);
         else if(proc_frame_p -> EAX == PUTCHAR)     PutCharHandler(proc_frame_p);
         else if(proc_frame_p -> EAX == FORK)        ForkHandler(proc_frame_p);   //PHASE7
-	      else if(proc_frame_p -> EAX == SIGNAL)      SignalHandler(proc_frame_p);   //PHASE8
-	      else cons_printf("Kernel Panic !!! EAX Value is: %x (%d).\n",(int)proc_frame_p -> EAX);
+	else if(proc_frame_p -> EAX == SIGNAL)      SignalHandler(proc_frame_p);   //PHASE8
+	else cons_printf("Kernel Panic !!! EAX Value is: %x (%d).\n",(int)proc_frame_p -> EAX);
         break;
      case TERM1_EVENT:
         TermHandler(TERM1);
