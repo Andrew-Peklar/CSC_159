@@ -110,14 +110,14 @@ void Kernel(proc_frame_t *proc_frame_p) {   // kernel code runs (100 times/secon
         else if(proc_frame_p -> EAX == SLEEP)	SleepHandler();
         else if(proc_frame_p -> EAX == GETPID)	GetPidHandler();
         else if(proc_frame_p -> EAX == MUTEX) {
-	  if(proc_frame_p -> EBX == LOCK)	MutexLockHandler();
-	  if(proc_frame_p -> EBX == UNLOCK)	MutexUnlockHandler();
+	         if(proc_frame_p -> EBX == LOCK)	MutexLockHandler();
+	         if(proc_frame_p -> EBX == UNLOCK)	MutexUnlockHandler();
         }
         else if(proc_frame_p -> EAX == GETCHAR)     GetCharHandler(proc_frame_p);
         else if(proc_frame_p -> EAX == PUTCHAR)     PutCharHandler(proc_frame_p);
-        else if(proc_frame_p -> EAX == FORK)      ForkHandler(proc_frame_p);   //PHASE7
-	else if(proc_frame_p -> EAX == SIGNAL)      SignalHandler(proc_frame_p);   //PHASE8
-	else cons_printf("Kernel Panic !!! EAX Value is: %x (%d).\n",(int)proc_frame_p -> EAX);
+        else if(proc_frame_p -> EAX == FORK)        ForkHandler(proc_frame_p);   //PHASE7
+	      else if(proc_frame_p -> EAX == SIGNAL)      SignalHandler(proc_frame_p);   //PHASE8
+	      else cons_printf("Kernel Panic !!! EAX Value is: %x (%d).\n",(int)proc_frame_p -> EAX);
         break;
      case TERM1_EVENT:
         TermHandler(TERM1);
@@ -127,7 +127,13 @@ void Kernel(proc_frame_t *proc_frame_p) {   // kernel code runs (100 times/secon
         TermHandler(TERM2);
         outportb(0x20, 0x64);
         break;
-   }
+     case EXIT:                             //PHASE 9
+        ExitHandler(proc_frame_p);
+        break;
+     case WAITPID:                          //PHASE 9
+        WaitPidHandler(proc_frame_p);
+        break;
+   }//end of switch
 
    if (cons_kbhit()) {
       key = cons_getchar();
