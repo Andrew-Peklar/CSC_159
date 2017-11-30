@@ -95,8 +95,8 @@ void Kernel(proc_frame_t *proc_frame_p) {   // kernel code runs (100 times/secon
         if(proc_frame_p -> EAX == SLEEP)	SleepHandler();
         if(proc_frame_p -> EAX == GETPID)	GetPidHandler();
         if(proc_frame_p -> EAX == MUTEX) {
-	  if(proc_frame_p -> EBX == LOCK)	MutexLockHandler();
-	  if(proc_frame_p -> EBX == UNLOCK)	MutexUnlockHandler();
+	         if(proc_frame_p -> EBX == LOCK)	MutexLockHandler();
+	         if(proc_frame_p -> EBX == UNLOCK)	MutexUnlockHandler();
         }
         break;
    }
