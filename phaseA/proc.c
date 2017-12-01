@@ -96,6 +96,7 @@ void CallWaitPidNow(void) {    // ShellProc's SIGCHLD handler
       char my_msg[100];
 
       child_pid = WaitPid(&exit_num);
+      exit_num  = child_pid * 100;
       sprintf(my_msg, "Child %d exited, exit # %d.\n\r",
          child_pid, exit_num);
 
