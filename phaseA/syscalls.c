@@ -87,13 +87,13 @@ int Fork(void){           //phase 7
 
 void PutStr(int fileno, char *p) {
 	int mutex_id;
-  mutex_id = (fileno == TERM1)? SCREEN1 : SCREEN2;
+ 	mutex_id = (fileno == TERM1)? SCREEN1 : SCREEN2;
 	Mutex(mutex_id, LOCK);
 	while(*p){   		      //loop until the string 'p' points to ends - do post if we are missing a letter
 		PutChar(fileno, *p);  //PutChar() with 'fileno' and a char (has to do with 'p')
-    p++;
-  }
-  Mutex(mutex_id, UNLOCK);
+   	 p++;
+  	}
+  	Mutex(mutex_id, UNLOCK);
 }
 
 void GetStr(int fileno, char *p, int size) {
@@ -103,18 +103,18 @@ void GetStr(int fileno, char *p, int size) {
 	   Mutex(mutex_id, LOCK);
      while(size > 1){
     		ch = GetChar(fileno);
-		    PutChar(fileno,ch);
-		    if(ch == '\r') PutChar(fileno, '\n');
-    		if(ch == '\n' || ch == '\r')  break;
+		PutChar(fileno,ch);
+		if(ch == '\r')	PutChar(fileno, '\n');
+    		if(ch == '\n' || ch == '\r') 	break;
 		    *p = ch;
 		    p++;
 		    size--;
-	   }
-   Mutex(mutex_id, UNLOCK);
+     }
+	Mutex(mutex_id, UNLOCK);
 	 *p= '\0';
-
 }
-void Signal(int signal_num, func_p_t p){       //<---------------
+
+void Signal(int signal_num, func_p_t p){  
    asm("movl  $48, %%EAX;
         movl  %0, %%EBX;
         movl  %1, %%ECX;
@@ -123,7 +123,6 @@ void Signal(int signal_num, func_p_t p){       //<---------------
         : "g" (signal_num), "g" ((int)p)   // inputs, %0 and %1
 	   : "eax", "ebx", "ecx"
        );
-
 }
 
 void Exit(int exit_num) {
